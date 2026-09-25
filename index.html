@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#071019" />
+    <meta name="description" content="Apex Circuit Mobile - 오프라인 모바일 1인칭 레이싱 게임" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Apex Circuit Mobile</title>
+  </head>
+  <body>
+    <main id="app" aria-label="Apex Circuit Mobile">
+      <canvas id="gameCanvas" aria-label="레이싱 게임 화면"></canvas>
+
+      <section id="hud" class="hud is-hidden" aria-live="polite">
+        <div class="hud-top">
+          <div class="telemetry-card">
+            <span class="telemetry-label">SPEED</span>
+            <strong id="speedValue">000</strong><span class="telemetry-unit">KM/H</span>
+          </div>
+          <div class="race-card">
+            <div><span class="muted">LAP</span> <strong id="lapValue">1/3</strong></div>
+            <div><span class="muted">POS</span> <strong id="positionValue">8/8</strong></div>
+          </div>
+          <div class="timer-card">
+            <span class="telemetry-label">TIME</span>
+            <strong id="timerValue">00:00.000</strong>
+          </div>
+        </div>
+        <div class="hud-bottom">
+          <div class="mfd-card">
+            <span class="mfd-title">APEX CIRCUIT</span>
+            <span id="sectorValue">SECTOR 1 · START/FINISH</span>
+          </div>
+          <div class="minimap-card">
+            <canvas id="minimapCanvas" width="156" height="98" aria-label="미니맵"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section id="touchControls" class="touch-controls is-hidden" aria-label="터치 조작">
+        <div class="steer-controls">
+          <button id="leftButton" class="control-button steer-button" aria-label="왼쪽 조향">◀</button>
+          <button id="rightButton" class="control-button steer-button" aria-label="오른쪽 조향">▶</button>
+        </div>
+        <div class="pedal-controls">
+          <button id="brakeButton" class="control-button brake-button" aria-label="브레이크">BRAKE</button>
+          <button id="throttleButton" class="control-button throttle-button" aria-label="가속">THROTTLE</button>
+        </div>
+      </section>
+
+      <section id="gameMenu" class="overlay-panel">
+        <div class="menu-glow"></div>
+        <div class="menu-content">
+          <p class="eyebrow">OFFLINE MOBILE RACING</p>
+          <h1>APEX<br /><span>CIRCUIT</span></h1>
+          <p class="menu-copy">모나코의 코너에서 영감을 받은<br />1인칭 포뮬러 레이싱 MVP</p>
+
+          <div class="setup-grid">
+            <label class="select-wrap">차량
+              <select id="carSelect">
+                <option value="aurora">A-01 Aurora · 균형형</option>
+                <option value="vortex">V-07 Vortex · 최고속형</option>
+                <option value="comet">C-03 Comet · 코너형</option>
+              </select>
+            </label>
+            <label class="select-wrap">난이도
+              <select id="difficultySelect">
+                <option value="easy">Rookie</option>
+                <option value="normal" selected>Grand Prix</option>
+                <option value="hard">Apex</option>
+              </select>
+            </label>
+            <label class="select-wrap">랩
+              <select id="lapsSelect">
+                <option value="1">1 LAP · 타임 어택</option>
+                <option value="3" selected>3 LAPS · 스프린트</option>
+                <option value="5">5 LAPS · 그랑프리</option>
+              </select>
+            </label>
+            <label class="select-wrap">시간대
+              <select id="weatherSelect">
+                <option value="day" selected>맑은 낮</option>
+                <option value="dusk">석양</option>
+                <option value="night">야간</option>
+                <option value="rain">가벼운 비</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="best-time-row">
+            <span>BEST LAP</span><strong id="bestTimeMenu">--:--.---</strong>
+          </div>
+          <button id="startButton" class="primary-button">RACE START <span>↗</span></button>
+          <p class="control-hint">기울여 조향 · THROTTLE을 누르고 BRAKE로 감속 · 화면을 두 번 탭해 시점 전환</p>
+        </div>
+      </section>
+
+      <section id="pausePanel" class="overlay-panel compact is-hidden">
+        <div class="menu-content compact-content">
+          <p class="eyebrow">RACE PAUSED</p>
+          <h2>잠시 정지</h2>
+          <button id="resumeButton" class="primary-button">RESUME</button>
+          <button id="quitButton" class="secondary-button">QUIT TO GARAGE</button>
+        </div>
+      </section>
+
+      <section id="resultPanel" class="overlay-panel compact is-hidden">
+        <div class="menu-content compact-content">
+          <p class="eyebrow" id="resultEyebrow">CHEQUERED FLAG</p>
+          <h2 id="resultTitle">FINISH</h2>
+          <div class="result-grid">
+            <div><span>POSITION</span><strong id="resultPosition">1 / 8</strong></div>
+            <div><span>RACE TIME</span><strong id="resultTime">00:00.000</strong></div>
+            <div><span>BEST LAP</span><strong id="resultBestLap">00:00.000</strong></div>
+            <div><span>TOP SPEED</span><strong id="resultTopSpeed">000 KM/H</strong></div>
+          </div>
+          <p id="newRecordText" class="record-text is-hidden">NEW PERSONAL BEST</p>
+          <button id="againButton" class="primary-button">RACE AGAIN <span>↗</span></button>
+          <button id="garageButton" class="secondary-button">GARAGE</button>
+        </div>
+      </section>
+
+      <button id="pauseButton" class="pause-button is-hidden" aria-label="일시정지">Ⅱ</button>
+      <button id="cameraButton" class="camera-button is-hidden" aria-label="카메라 전환">CAM</button>
+      <div id="orientationNotice" class="notice is-hidden">휴대폰을 가로로 돌려 플레이하세요</div>
+      <div id="toast" class="toast" role="status"></div>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>
